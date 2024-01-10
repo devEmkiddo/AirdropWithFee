@@ -259,7 +259,7 @@ contract Airdrop{
 
     //Must send ether to the contract to be eligigle for the airdrop 
 
-    function claim() public payable{
+    function claim() external payable{
       require(msg.value >= fee, "Not enough fee");
       require(token.balanceOf(address(this)) >= airdropAmount, "Insufficient contract balance");
       if (isEligible[msg.sender] == true){
@@ -272,14 +272,14 @@ contract Airdrop{
       //the contract again..
     }
    
-    function _withdrawEther() internal  {
+    function _withdrawEther() private  {
       uint256 contractBal = address(this).balance;
       require(contractBal > 0, "Balance must be greater than 0");
       (bool success, ) = payable(msg.sender).call{value: contractBal}("");
       require(success, "Failed to send ether");
     }
 
-    function _withdrawTokens() internal {
+    function _withdrawTokens() private {
         uint256 contractBal = token.balanceOf(address(this));
         require(contractBal > 0, "Balance must be greater than 0");
         token.transfer(owner, contractBal);
@@ -291,7 +291,7 @@ contract Airdrop{
       emit Withdrawal(address(this), msg.sender, address(this).balance);
     }
 
-    function withdrawTokens() external onlyOwner noReentrancy{
+    function withdrawTokens() external onlyOwner{
        _withdrawTokens();
        emit Withdrawal(address(this), msg.sender, token.balanceOf(address(this)));
     }
@@ -331,7 +331,6 @@ contract Airdrop{
         beneficiaries.push(msg.sender);
         isEligible[msg.sender] = true;
     }
-    fallback() external payable { }
 }
 
 //MADE BY devEMKIDDO 
